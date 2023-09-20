@@ -10,13 +10,28 @@ export EMU_DATABASE_DIR=$1
 # echo "Output path: $EMU_DATABASE_DIR"
 # Get the directories for all the barcodes
 export prefix="barcode";
-echo "prefix: $prefix"
+#echo "prefix: $prefix"
 barcode_dir_list=`ls -d $2/$prefix*`
 #echo "Barcode directories list: $barcode_dir_list"
+# Unzip fastaq files
 # Iterate over the list of barcode directories.
 for bc_dir in $barcode_dir_list;
+# If barcode directory contains files
+do files=$(shopt -s nullglob dotglob; echo $bc_dir/*);
+if (( ${#files} ));
+mkdir $bc_dir/fastaq
+then echo "Unzipping files in: $bc_dir";
+#echo $files
+for f in $bc_dir/*.gz; do
+  STEM=$(basename "${f}" .gz)
+  gunzip -c "${f}" > $bc_dir/fastaq/"${STEM}"
+done
+fi
+done
+# Iterate over the list of barcode directories to run emu.
+for bc_dir in $barcode_dir_list;
 do echo $bc_dir;
-# If barcode directory exists
+# If barcode/fastaq directory exists
 if [ -d "$bc_dir/fastaq/" ];
 then export barcode_files=$bc_dir/fastaq/*;
 #echo $barcode_files;
