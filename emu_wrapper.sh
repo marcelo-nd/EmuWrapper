@@ -8,7 +8,7 @@ echo "Output path: $3"
 # Set the database directory
 export EMU_DATABASE_DIR=$1
 # echo "Output path: $EMU_DATABASE_DIR"
-# Prefix for the names of barcode folders. Maybe it changes in the future.
+# Prefix for the names of barcode folders. Maybe it changes in the future or can ask user.
 export prefix="barcode";
 #echo "prefix: $prefix"
 # Get the directories for all the barcodes
@@ -43,17 +43,11 @@ for bc_dir in $barcode_dir_list;
 do echo $bc_dir;
 # If barcode/fastaq directory exists
 if [ -d "$bc_dir/fastq/" ];
-# get the list of fastq files
-#then export barcode_files=$bc_dir/fastaq/*;
-#echo $barcode_files;
-#for fq_file in $barcode_files;
-#do echo $fq_file;
 # RUN emu!!!
 then fq_file=$bc_dir/fastq/*_concat.fastq;
 echo $fq_file;
 emu abundance $fq_file --output-dir $3 --keep-counts;
-#done;
-# If the fastq folder doesnot exist tell the user.
+# If the fastq folder does not exist tell the user.
 else echo "fastq folder does not exist";
 fi
 done
