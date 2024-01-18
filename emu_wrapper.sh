@@ -1,31 +1,33 @@
 #!/bin/bash
 
-while getopts ":d:s:o:b:n:" option; do
-  case $option in
-    h)
-      echo "Usage: $0 [-d Database EMU_DATABASE_DIR] [-s sequences_path] [-o output_path] [-b barcodes_to_merge] [n sample_names]"
-      exit 1
-      ;;
+EMU_DATABASE_DIR=''
+sequences_path=''
+output_path=''
+barcodes_to_merge=''
+sample_names=''
+
+print_usage() {
+  printf "Usage: ..."
+  #echo "Usage: $0 [-d Database EMU_DATABASE_DIR] [-s sequences_path] [-o output_path] [-b barcodes_to_merge] [n sample_names]"
+}
+
+while getopts 'd:s:o:b:n:' flag; do
+  case "${flag}" in
     d)
       # Set the database directory
-      export EMU_DATABASE_DIR="$OPTARG"
-      ;;
+      export EMU_DATABASE_DIR="${OPTARG}" ;;
     s)
       # Set the sequences directory
-      sequences_path="$OPTARG"
-      ;;
+      sequences_path="${OPTARG}" ;;
     o)
       # Set Output directory path
-      output_path="$OPTARG"
-      ;;
+      output_path="${OPTARG}" ;;
     b)
       # Set barcodes to merge
-      barcodes_to_merge="$OPTARG"
-      ;;
+      barcodes_to_merge="${OPTARG}" ;;
     n)
       # Set sample names
-      sample_names="$OPTARG"
-      ;;
+      sample_names="${OPTARG}" ;;
   esac
 done
 # Print parsed Database directory path
