@@ -1,15 +1,26 @@
 #!/bin/bash
 
-EMU_DATABASE_DIR=''
-sequences_path=''
-output_path=''
-barcodes_to_merge=''
-sample_names=''
+#EMU_DATABASE_DIR=''
+#sequences_path=''
+#output_path=''
+#barcodes_to_merge=''
+#sample_names=''
 
-print_usage() {
-  printf "Usage: ..."
-  #echo "Usage: $0 [-d Database EMU_DATABASE_DIR] [-s sequences_path] [-o output_path] [-b barcodes_to_merge] [n sample_names]"
+function print_usage {
+    echo "usage: [-d database] [-s sequences] [-o output] [-b barcodes] [-n names]"
+    echo "  -h      print help"
+    echo "  -d      specify Emu database path to be used"
+    echo "  -s      specifiy the path to your sequence zip files"
+    echo "  -o      spcifiy the output path were OTU tables are going to be stored"
+    echo "  -b      specify wich barcodes are going to be processed"
+    echo "  -n      specifiy the name of the samples"
 }
+
+if [[ ( $@ == "--help") ||  $@ == "-h" ]]
+then
+	print_usage
+  return
+fi
 
 while getopts 'd:s:o:b:n:' flag; do
   case "${flag}" in
@@ -30,6 +41,7 @@ while getopts 'd:s:o:b:n:' flag; do
       sample_names="${OPTARG}" ;;
   esac
 done
+
 # Print parsed Database directory path
 echo "Database path: $EMU_DATABASE_DIR"
 # Print parsed Sequences directory path
@@ -92,4 +104,4 @@ fi
 done
 # PART 3 MERGE THE TABLES INTO ONE OTU TABLE THAT CONTAINS ALL BARCODES SELECTED BY USER
 #Execute R to merge the tables
-Rscript ./tables_merging.R "/mnt/c/Users/Marcelo/Desktop/results/" $barcodes_to_merge $sample_names
+sudo Rscript ./tables_merging.R $output_path $barcodes_to_merge $sample_names

@@ -116,6 +116,8 @@ if (!is.null(sample_names) && length(sample_names) == length(barcodes_to_process
   colnames(otu_table) <- c(colnames(otu_table)[1], sample_names[[1]])
 }
 
+otu_table <- plyr::ddply(otu_table, "species", plyr::numcolwise(sum))
+
 print(head(otu_table))
 
 write.table(otu_table, file = paste0(user_path, "otu_table.csv"), quote = FALSE, row.names = FALSE, sep = ",")
