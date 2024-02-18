@@ -14,7 +14,9 @@ function print_usage {
     echo "  -h      print help"
     echo "  -d      specify Emu database path to be used"
     echo "  -s      specifiy the path to your sequence zip files"
-    echo "  -o      spcifiy the output path were OTU tables are going to be stored"
+    echo "  -o      specifiy the output path were OTU tables are going to be stored"
+    echo "  -c      specify if you want to perferom copy number adjustment (TRUE or FALSE)"
+    echo "  -p      specify the path to the copy number database"
 }
 
 if [[ ( $@ == "--help") ||  $@ == "-h" ]]
@@ -26,7 +28,7 @@ fi
 # Reset OPTIND to wnter while loop assignment
 OPTIND=1
 
-while getopts 'd:s:o:b:n:' flag; do
+while getopts 'd:s:o:c:p:n:' flag; do
 #echo "assigning variables"
   case "${flag}" in
     d)
@@ -38,6 +40,12 @@ while getopts 'd:s:o:b:n:' flag; do
     o)
       # Set Output directory path
       output_path="${OPTARG}" ;;
+    c)
+      # set if copy number adjustment is going to be performed
+      copy_adjust="${OPTARG}" ;;
+    p)
+      # set copy database path
+      copy_db_path="${OPTARG}" ;;
     *)
       print_usage
       return
@@ -106,4 +114,4 @@ done
 
 # PART 3 MERGE THE TABLES INTO ONE OTU TABLE THAT CONTAINS ALL BARCODES SELECTED BY USER
 #Execute R to merge the tables
-Rscript ./tables_merging.R $output_path $barcodes_to_merge $sample_names
+Rscript ./tables_merging.R $output_path $copy_adjust $copy_db_path

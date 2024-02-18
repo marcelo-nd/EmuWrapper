@@ -9,12 +9,31 @@ library(readr)
 
 library(dplyr, quietly = TRUE)
 
+# Function for using a copy database to adjust final copy number
+weight_gene_copies <- function(otu_table, copies){
+  otu_table_16s_weighted <- otu_table
+  for(row_num in 1:nrow(otu_table_16s_weighted)){
+    if (rownames(otu_table_16s_weighted[row_num,]) %in% copies$species) {
+      copy_number <- copies[copies$species == rownames(otu_table_16s_weighted[row_num,]),]$copies
+      otu_table_16s_weighted[row_num,] <- otu_table_16s_weighted[row_num,]/copy_number
+      #print(rownames(otu_table[row_num,]))
+      #print(copies[copies$species == rownames(otu_table[row_num,]),]$copies)
+      #print(otu_table[row_num,]/5)
+    }
+  }
+  return(otu_table_16s_weighted)
+}
+
 # Read arguments from console execution of R script
 args <- commandArgs(trailingOnly = TRUE)
 #print(args)
 
 # Assign first argument to user_path. Where the result tables are.
 user_path <- args[1]
+
+copy_adjust <- args[2]
+
+copy_db_path <- args[3]
 
 # Initialize variables
 abundance_tables <- list.files(path = user_path, pattern = NULL, all.files = FALSE,
@@ -61,7 +80,13 @@ otu_table["species"][is.na(otu_table["species"])] <- "Unassigned"
 # Replace NAs with 0
 otu_table[is.na(otu_table)] <- 0
 
+# Collapse rows that are the same species
 otu_table <- plyr::ddply(otu_table, "species", plyr::numcolwise(sum))
+
+if (copy_adjust && !is.null(copy_db_path)) {
+  copy_db <- read.csv(copy_db_path, sep=";")
+  otu_table <- weight_gene_copies(otu_table, copy_db)
+}
 
 print(head(otu_table))
 
