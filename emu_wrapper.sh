@@ -29,7 +29,7 @@ fi
 # Reset OPTIND to wnter while loop assignment
 OPTIND=1
 
-while getopts 'd:s:o:c:p:n:' flag; do
+while getopts 'd:s:z:o:c:p:n:' flag; do
 #echo "assigning variables"
   case "${flag}" in
     d)
@@ -62,6 +62,7 @@ echo -e "${BLUE}Database path: $EMU_DATABASE_DIR${NC}"
 echo -e "${BLUE}Sequences path: $sequences_path${NC}"
 # Print parsed Output directory path
 echo -e "${BLUE}Output path: $output_path${NC}"
+echo -e "${BLUE}Unzipping?: $unzip_seqs${NC}"
 
 # Prefix for the names of barcode folders. Maybe it changes in the future or can ask user.
 export prefix="barcode";
@@ -71,7 +72,9 @@ barcode_dir_list=`ls -d $sequences_path/$prefix*`
 #echo "Barcode directories list: $barcode_dir_list"
 # PART 1 UNZIP GZ FILES:
 # For loop to Unzip fastaq files
-# Iterate over the list of barcode directories.
+# Iterate over the list of barcode directories if user already has unzip packages
+if [ $unzip_seqs == "TRUE" ];
+then
 for bc_dir in $barcode_dir_list;
 # If barcode directory contains files
 # First get the list of files
@@ -98,6 +101,7 @@ for bc_dir in $barcode_dir_list;
     cat $bc_dir/fastq/* > $bc_dir/fastq/"${a: -9:9}_concat.fastq"
     fi
 done
+fi
 
 # PART 2 RUN EMU
 # Iterate over the list of barcode directories to run emu.
