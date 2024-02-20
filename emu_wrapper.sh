@@ -14,8 +14,9 @@ function print_usage {
     echo "  -h      print help"
     echo "  -d      specify Emu database path to be used"
     echo "  -s      specifiy the path to your sequence zip files"
+    echo "  -z      specify if you want to unzip barcode sequences ("TRUE" or "FALSE")"
     echo "  -o      specifiy the output path were OTU tables are going to be stored"
-    echo "  -c      specify if you want to perferom copy number adjustment (TRUE or FALSE)"
+    echo "  -c      specify if you want to perferom copy number adjustment ("TRUE" or "FALSE")"
     echo "  -p      specify the path to the copy number database"
 }
 
@@ -37,6 +38,9 @@ while getopts 'd:s:o:c:p:n:' flag; do
     s)
       # Set the sequences directory
       sequences_path="${OPTARG}" ;;
+    z)
+      # Set the sequences directory
+      unzip_seqs="${OPTARG}" ;;  
     o)
       # Set Output directory path
       output_path="${OPTARG}" ;;
@@ -114,4 +118,4 @@ done
 
 # PART 3 MERGE THE TABLES INTO ONE OTU TABLE THAT CONTAINS ALL BARCODES SELECTED BY USER
 #Execute R to merge the tables
-Rscript ./tables_merging.R $output_path $copy_adjust $copy_db_path
+Rscript $EMUWRAPPER_LOC/tables_merging.R $output_path $copy_adjust $copy_db_path

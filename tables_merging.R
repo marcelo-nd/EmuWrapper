@@ -5,9 +5,14 @@ if (!require("readr", quietly = TRUE))
 if (!require("dplyr", quietly = TRUE))
   install.packages("dplyr")
 
+if (!require("plyr", quietly = TRUE))
+  install.packages("plyr", lib = "/usr/lib/R/library")
+
 library(readr)
 
 library(dplyr, quietly = TRUE)
+
+library("plyr", quietly = TRUE)
 
 # Function for using a copy database to adjust final copy number
 weight_gene_copies <- function(otu_table, copies){
@@ -82,8 +87,9 @@ otu_table[is.na(otu_table)] <- 0
 
 # Collapse rows that are the same species
 otu_table <- plyr::ddply(otu_table, "species", plyr::numcolwise(sum))
+#otu_table <- ddply(otu_table, "species", numcolwise(sum))
 
-if (copy_adjust && !is.null(copy_db_path)) {
+if (copy_adjust == "TRUE" && !is.null(copy_db_path)) {
   copy_db <- read.csv(copy_db_path, sep=";")
   otu_table <- weight_gene_copies(otu_table, copy_db)
 }
