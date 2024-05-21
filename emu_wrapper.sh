@@ -114,7 +114,7 @@ for bc_dir in $barcode_dir_list;
       then fq_file=$bc_dir/fastq/*_concat.fastq;
       #echo $fq_file;
       echo -e "${GREEN}Running emu on : $fq_file${NC}"
-      emu abundance $fq_file --output-dir $output_path --keep-counts --keep-files --keep-read-assignments --N 25 --threads 6;
+      emu abundance $fq_file --output-dir $output_path --keep-counts --keep-files --keep-read-assignments --N 50 --threads 6;
     # If the fastq folder does not exist tell the user.
     else echo "${RED}fastq folder doesn't exist${NC}";
     fi
