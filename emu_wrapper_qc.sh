@@ -56,21 +56,25 @@ export prefix="barcode";
 barcode_dir_list=`ls -d $sequences_path/$prefix*`
 #echo "Barcode directories list: $barcode_dir_list"
 
-
-# PART Run chopper on every fastq file for every barcode* subfolder in "sequences_path"
+# Create output fastaq directory
+    if ! [ -d "$output_path/fastq_qc2/" ];
+      # create "fastaq" directory
+      then mkdir $output_path/fastq_qc2
+    fi
+# PART 1. Run chopper on every fastq file for every barcode* subfolder in "sequences_path"
 # Iterate over the list of barcode directories to run emu.
 for bc_dir in $barcode_dir_list;
   do
   # echo $bc_dir;
   a="$bc_dir"
-  # If barcode/fastaq directory exists
-    if [ -d "$bc_dir/fastq/" ];
-    # RUN emu!!!
-      then fq_file=$bc_dir/fastq/*_concat.fastq;
-      mkdir $bc_dir/fastq_qc
+  # If barcode/fastaq directory exists, it will, delete
+    if [ "TRUE" == "TRUE" ];
+    # Create barcode subfolder in fastq_qc
+      then fq_file=$bc_dir/*_concat.fastq;
+      mkdir $output_path/fastq_qc2/${a: -9:9}
       #echo $fq_file;
       echo -e "${GREEN}Running chopper on : $fq_file${NC}"
-      chopper --quality 10 --minlength 1000 --maxlength 4300 -i $fq_file > $bc_dir/fastq_qc/"${a: -9:9}_qc.fastq";
+      chopper --quality 10 --minlength 2500 --maxlength 4300 -i $fq_file > $output_path/fastq_qc2/${a: -9:9}/"${a: -9:9}_qc.fastq";
     # If the fastq folder does not exist tell the user.
     else echo "${RED}fastq folder doesn't exist${NC}";
     fi

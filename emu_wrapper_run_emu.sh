@@ -29,21 +29,32 @@ fi
 # Reset OPTIND to wnter while loop assignment
 OPTIND=1
 
-while getopts 's:o:' flag; do
+while getopts 'd:s:z:o:c:p:n:' flag; do
 #echo "assigning variables"
   case "${flag}" in
+    d)
+      # Set the database directory
+      export EMU_DATABASE_DIR="${OPTARG}" ;;
     s)
       # Set the sequences directory
       sequences_path="${OPTARG}" ;;
     o)
       # Set Output directory path
       output_path="${OPTARG}" ;;
+    c)
+      # set if copy number adjustment is going to be performed
+      copy_adjust="${OPTARG}" ;;
+    p)
+      # set copy database path
+      copy_db_path="${OPTARG}" ;;
     *)
       print_usage
       return
   esac
 done
 
+# Print parsed Database directory path
+echo -e "${BLUE}Database path: $EMU_DATABASE_DIR${NC}"
 # Print parsed Sequences directory path
 echo -e "${BLUE}Sequences path: $sequences_path${NC}"
 # Print parsed Output directory path
@@ -55,44 +66,29 @@ export prefix="barcode";
 # Get the directories for all the barcodes
 barcode_dir_list=`ls -d $sequences_path/$prefix*`
 #echo "Barcode directories list: $barcode_dir_list"
-# PART 1 UNZIP GZ FILES:
-# For loop to Unzip fastaq files
-# Iterate over the list of barcode directories if user already has unzip packages
-if [ "TRUE" == "TRUE" ];
-then
-# Create output fastaq directory
-    if ! [ -d "$output_path/fastq/" ];
+
+if ! [ -d "$output_path/emu_results/" ];
       # create "fastaq" directory
-      then mkdir $output_path/fastq
+      then mkdir $output_path/emu_results
     fi
+
+# PART 2 RUN EMU
+# Iterate over the list of barcode directories to run emu.
 for bc_dir in $barcode_dir_list;
-# If barcode directory contains files
-# First get the list of files
-  do files=$(shopt -s nullglob dotglob; echo $bc_dir/*);
-    #echo {$bc_dir}
-    a="$bc_dir"
-    #echo ${a: -9:9}
-    # if list of files variable contains something
-    if (( ${#files} ));
-    then echo -e "${GREEN}Unzipping files in: $bc_dir${NC}";
-    # If barcode/fastaq directory does not exists
-      #if ! [ -d "$bc_dir/fastq/" ];
-      if ! [ -d "$output_path/fastq/${a: -9:9}" ];
-      # create "fastaq" directory
-      then mkdir $output_path/fastq/${a: -9:9}
-      fi
-    #echo $files
-      for f in "$bc_dir"/*.gz; do
-      # Run gunzip, retain files and extract in "fastaq" directory
-      STEM=$(basename "${f}" .gz)
-      
-      # gunzip: c flag is for keeping original files, f flag is to replace the ones that exist in output if they have the same name
-      gunzip -k -c -f "${f}" > $output_path/fastq/"${a: -9:9}"/"${STEM}"
-      gunzip -k -c -f "${f}" > $output_path/fastq/"${a: -9:9}"/"${STEM}2"
-      done
-    # Concat fastq files to run EMU once per barcode  
-    #cat $bc_dir/fastq/* > $bc_dir/fastq/"${a: -9:9}_concat.fastq"
-    cat $output_path/fastq/"${a: -9:9}"/* > $output_path/fastq/${a: -9:9}/"${a: -9:9}_concat.fastq"
+  do
+  # echo $bc_dir;
+  # If barcode/fastaq directory exists, it will, delete
+    if [ "TRUE" == "TRUE" ];
+    # RUN emu!!!
+      then fq_file=$bc_dir/*_qc.fastq;
+      #echo $fq_file;
+      echo -e "${GREEN}Running emu on : $fq_file${NC}"
+      emu abundance $fq_file --output-dir $output_path/emu_results --keep-counts --keep-files --keep-read-assignments --N 50 --threads 6;
+    # If the fastq folder does not exist tell the user.
+    else echo "${RED}fastq folder doesn't exist${NC}";
     fi
 done
-fi
+
+# PART 3 MERGE THE TABLES INTO ONE OTU TABLE THAT CONTAINS ALL BARCODES SELECTED BY USER
+#Execute R to merge the tables
+Rscript $EMUWRAPPER_LOC/tables_merging.R $output_path/emu_results $copy_adjust $copy_db_path
