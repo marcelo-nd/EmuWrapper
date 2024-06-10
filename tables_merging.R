@@ -43,24 +43,25 @@ copy_adjust <- args[2]
 copy_db_path <- args[3]
 
 # Initialize variables
-abundance_tables <- list.files(path = user_path, pattern = NULL, all.files = FALSE,
+abundance_tables <- list.files(path = user_path, pattern = "rel-abundance\\.tsv$", all.files = FALSE,
                                  full.names = FALSE, recursive = FALSE,
                                  ignore.case = FALSE, include.dirs = FALSE, no.. = FALSE)
 
-#print(abundance_tables)
+print(abundance_tables)
 
 barcode_numbers <- c()
 
 #Generate barcode names from abundance tables.
 for (table in seq(from = 1, to = length(abundance_tables), by=1)) {
-  # Using the last two characters of each abundance table file
+  # Using the characters of the barcode number of each abundance table file
   current_bc <- substr(abundance_tables[table], start = 8, stop = 9)
-  if (substr(abundance_tables[table], start = 18, stop = 34) == "rel-abundance.tsv"){
-    barcode_numbers <- c(barcode_numbers, current_bc)
-  }
+  barcode_numbers <- c(barcode_numbers, current_bc)
+#  if (substr(abundance_tables[table], start = 18, stop = 34) == "rel-abundance.tsv"){
+#    barcode_numbers <- c(barcode_numbers, current_bc)
+#  }
 }
 
-#print(barcode_numbers)
+print(barcode_numbers)
 
 #print(length(abundance_tables))
 

@@ -81,6 +81,7 @@ for bc_dir in $barcode_dir_list;
     if [ "TRUE" == "TRUE" ];
     # RUN emu!!!
       then fq_file=$bc_dir/*_qc.fastq;
+      #then fq_file=$bc_dir/*_concat.fastq;
       #echo $fq_file;
       echo -e "${GREEN}Running emu on : $fq_file${NC}"
       emu abundance $fq_file --output-dir $output_path/emu_results --keep-counts --keep-files --keep-read-assignments --N 50 --threads 6;
