@@ -88,7 +88,6 @@ for bc_dir in $barcode_dir_list;
       
       # gunzip: c flag is for keeping original files, f flag is to replace the ones that exist in output if they have the same name
       gunzip -k -c -f "${f}" > $output_path/fastq/"${a: -9:9}"/"${STEM}"
-      gunzip -k -c -f "${f}" > $output_path/fastq/"${a: -9:9}"/"${STEM}2"
       done
     # Concat fastq files to run EMU once per barcode  
     #cat $bc_dir/fastq/* > $bc_dir/fastq/"${a: -9:9}_concat.fastq"
