@@ -74,8 +74,8 @@ for bc_dir in $barcode_dir_list;
       mkdir $output_path/fastq_qc/${a: -9:9}
       #echo $fq_file;
       echo -e "${GREEN}Running chopper on : $fq_file${NC}"
-      chopper --quality 10 --minlength 1000 --maxlength 4500 -i $fq_file > $output_path/fastq_qc/${a: -9:9}/"${a: -9:9}_qc.fastq";
-      #chopper --quality 10 --minlength 200 --maxlength 4500 -i $fq_file > $output_path/fastq_qc/${a: -9:9}/"${a: -9:9}_qc.fastq";
+      #chopper --quality 10 --minlength 1000 --maxlength 4500 -i $fq_file > $output_path/fastq_qc/${a: -9:9}/"${a: -9:9}_qc.fastq";
+      chopper --quality 10 --minlength 500 --maxlength 4500 -i $fq_file > $output_path/fastq_qc/${a: -9:9}/"${a: -9:9}_qc.fastq";
       #chopper --quality 10 --minlength 200 --maxlength 1000 -i $fq_file > $output_path/fastq_qc/${a: -9:9}/"${a: -9:9}_qc.fastq";
     # If the fastq folder does not exist tell the user.
     else echo "${RED}fastq folder doesn't exist${NC}";
