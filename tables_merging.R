@@ -54,14 +54,19 @@ barcode_numbers <- c()
 #Generate barcode names from abundance tables.
 for (table in seq(from = 1, to = length(abundance_tables), by=1)) {
   # Using the characters of the barcode number of each abundance table file
-  current_bc <- substr(abundance_tables[table], start = 8, stop = 9)
+  #current_bc <- substr(abundance_tables[table], start = 8, stop = 9)
+  current_bc_string <- (strsplit(abundance_tables[table],split="_",fixed=T)[[1]][1])
+  #print(current_bc_string)
+  current_bc <- substr(current_bc_string, start = 8, nchar(current_bc_string))
+  #print(abundance_tables[table])
+  #print(strsplit(abundance_tables[table],split="_",fixed=T)[[1]][1])
   barcode_numbers <- c(barcode_numbers, current_bc)
 #  if (substr(abundance_tables[table], start = 18, stop = 34) == "rel-abundance.tsv"){
 #    barcode_numbers <- c(barcode_numbers, current_bc)
 #  }
 }
 
-print(barcode_numbers)
+#print(barcode_numbers)
 
 #print(length(abundance_tables))
 

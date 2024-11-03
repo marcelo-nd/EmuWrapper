@@ -1,8 +1,9 @@
 #!/bin/bash
 
-EMU_DATABASE_DIR=''
-sequences_path=''
-output_path=''
+EMU_DATABASE_DIR=""
+sequences_path=""
+output_path=""
+bc_dir=""
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -56,42 +57,52 @@ export prefix="barcode";
 barcode_dir_list=`ls -d $sequences_path/$prefix*`
 #echo "Barcode directories list: $barcode_dir_list"
 # PART 1 UNZIP GZ FILES:
-# For loop to Unzip fastaq files
-# Iterate over the list of barcode directories if user already has unzip packages
-if [ "TRUE" == "TRUE" ];
-then
+
 # Create output fastaq directory
-    if ! [ -d "$output_path/fastq/" ];
-      # create "fastaq" directory
-      then mkdir $output_path/fastq
-    fi
-for bc_dir in $barcode_dir_list;
-# If barcode directory contains files
-# First get the list of files
-  do files=$(shopt -s nullglob dotglob; echo $bc_dir/*);
-    #echo {$bc_dir}
-    a="$bc_dir"
-    #echo ${a: -9:9}
-    # if list of files variable contains something
-    if (( ${#files} ));
-    then echo -e "${GREEN}Unzipping files in: $bc_dir${NC}";
-    # If barcode/fastaq directory does not exists
-      #if ! [ -d "$bc_dir/fastq/" ];
-      if ! [ -d "$output_path/fastq/${a: -9:9}" ];
-      # create "fastaq" directory
-      then mkdir $output_path/fastq/${a: -9:9}
-      fi
-    #echo $files
-      for f in "$bc_dir"/*.gz; do
-      # Run gunzip, retain files and extract in "fastaq" directory
-      STEM=$(basename "${f}" .gz)
-      
-      # gunzip: c flag is for keeping original files, f flag is to replace the ones that exist in output if they have the same name
-      gunzip -k -c -f "${f}" > $output_path/fastq/"${a: -9:9}"/"${STEM}"
-      done
-    # Concat fastq files to run EMU once per barcode  
-    #cat $bc_dir/fastq/* > $bc_dir/fastq/"${a: -9:9}_concat.fastq"
-    cat $output_path/fastq/"${a: -9:9}"/* > $output_path/fastq/${a: -9:9}/"${a: -9:9}_concat.fastq"
-    fi
-done
+if ! [ -d "$output_path/fastq/" ];
+  # create "fastaq" directory
+  then mkdir $output_path/fastq
 fi
+
+# For loop to Unzip fastaq files
+for bc_dir in $barcode_dir_list; do
+  #echo $bc_dir
+  delimiter="/"
+  last_piece=""
+
+  # Replace delimiter with a newline and loop through each line
+  for part in ${bc_dir//"$delimiter"/$'\n'}; do
+    #echo "$part"
+    bc_string="$part"
+  done
+  # Print the last piece
+  #echo "$bc_string"
+
+  # Get the list of files in sample directory
+  files=$(shopt -s nullglob dotglob; echo $bc_dir/*);
+  
+#     #echo $files
+#     #echo {$bc_dir}
+#     #a="$bc_dir"
+#     #echo ${a: -9:9}
+#     # if list of files inside bc directory variable contains something
+  if (( ${#files} ));
+  then echo -e "${GREEN}Unzipping files in: $bc_dir${NC}";
+  # If barcode/fastaq directory does not exists, this is were unzipped fastaq files are stored
+  if ! [ -d "$output_path/fastq/$bc_string" ];
+    # create "fastaq" directory
+    then mkdir $output_path/fastq/$bc_string
+  fi
+  # Now lets iterate over al the gz files to uncompress them
+  for f in "$bc_dir"/*.gz; do
+    # Run gunzip, retain files and extract in "fastaq" directory
+    STEM=$(basename "${f}" .gz)
+    # gunzip: c flag is for keeping original files, f flag is to replace the ones that exist in output if they have the same name
+    gunzip -k -c -f "${f}" > $output_path/fastq/$bc_string/"${STEM}"
+  done
+  # Concat fastq files to run EMU once per barcode
+  cat $output_path/fastq/$bc_string/* > $output_path/fastq/$bc_string/"${bc_string}_concat.fastq"
+  fi
+done
+
+
