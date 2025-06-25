@@ -18,14 +18,21 @@ print("Merging tables from all barcodes!")
 
 # Function for using a copy database to adjust final copy number
 weight_gene_copies <- function(otu_table, copies){
+  #species_names <- otu_table$species
+  #otu_table_16s_weighted <- otu_table[2:ncol(otu_table)]
   otu_table_16s_weighted <- otu_table
   for(row_num in 1:nrow(otu_table_16s_weighted)){
-    if (rownames(otu_table_16s_weighted[row_num,]) %in% copies$species) {
-      copy_number <- copies[copies$species == rownames(otu_table_16s_weighted[row_num,]),]$copies
-      otu_table_16s_weighted[row_num,] <- otu_table_16s_weighted[row_num,]/copy_number
-      #print(rownames(otu_table[row_num,]))
-      #print(copies[copies$species == rownames(otu_table[row_num,]),]$copies)
-      #print(otu_table[row_num,]/5)
+    species_name <- otu_table_16s_weighted["species"][row_num,]
+    #print(species_name)
+    if (species_name %in% copies$species) {
+      #print(paste(species_name, "is present in copy database"))
+      copy_number <- copies[copies$species == species_name,]$copies
+      #print(copy_number)
+      #print(otu_table_16s_weighted[row_num,])
+      otu_table_16s_weighted[row_num,2:ncol(otu_table_16s_weighted)] <- otu_table_16s_weighted[row_num,2:ncol(otu_table_16s_weighted)]/copy_number
+    }
+    else{
+      print(paste(species_name, "is not present in copy database"))
     }
   }
   return(otu_table_16s_weighted)
@@ -110,11 +117,13 @@ otu_table <- plyr::ddply(otu_table, "species", plyr::numcolwise(sum))
 #otu_table <- ddply(otu_table, "species", numcolwise(sum))
 
 if (copy_adjust == "TRUE" && !is.null(copy_db_path)) {
+  print("Adjusting for copy numbers")
   copy_db <- read.csv(copy_db_path, sep=";")
+  #print(head(copy_db))
   otu_table <- weight_gene_copies(otu_table, copy_db)
 }
 
 print(head(otu_table))
 #print(otu_table)
 
-write.table(otu_table, file = paste0(user_path, "/otu_table.csv"), quote = FALSE, row.names = FALSE, sep = ",")
+write.table(otu_table, file = paste0(user_path, "/otu_table.csv"), quote = FALSE, row.names = FALSE, sep = ";")
