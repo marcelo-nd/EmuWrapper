@@ -116,14 +116,15 @@ otu_table[is.na(otu_table)] <- 0
 otu_table <- plyr::ddply(otu_table, "species", plyr::numcolwise(sum))
 #otu_table <- ddply(otu_table, "species", numcolwise(sum))
 
+write.table(otu_table, file = paste0(user_path, "/otu_table_unadjusted.csv"), quote = FALSE, row.names = FALSE, sep = ";")
+
 if (copy_adjust == "TRUE" && !is.null(copy_db_path)) {
   print("Adjusting for copy numbers")
   copy_db <- read.csv(copy_db_path, sep=";")
   #print(head(copy_db))
   otu_table <- weight_gene_copies(otu_table, copy_db)
+  write.table(otu_table, file = paste0(user_path, "/otu_table_adjusted.csv"), quote = FALSE, row.names = FALSE, sep = ";")
 }
 
 print(head(otu_table))
 #print(otu_table)
-
-write.table(otu_table, file = paste0(user_path, "/otu_table.csv"), quote = FALSE, row.names = FALSE, sep = ";")
